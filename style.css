@@ -145,14 +145,15 @@ code {
 }
 
 .deck-container .deck,.deck-container .last-card { 
-  display: none;
+  opacity:0;
   background-size:cover;
-  height:190px;
+  height:0px;
   width:130px;
 }
 
 .deck-container .deck.active,.deck-container .last-card.active { 
-  display: block;
+  opacity: 1;
+  height:190px;
 }
 
 .App { 

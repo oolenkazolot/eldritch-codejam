@@ -199,17 +199,20 @@ const helper = {
     const currentState = document.querySelector('.current-state');
     currentState.textContent = '';
     for (let i = 0; i < this.state.amountCardsForStages.length; i++) {
-      this.createStageContainer(this.state.amountCardsForStages[i]);
-      const stageContainer = this.createStageContainer(this.state.amountCardsForStages[i]);
+      const stageContainer = this.createStageContainer(this.state.amountCardsForStages[i], i);
       currentState.append(stageContainer);
     }
   },
-  createStageContainer: function (amountCardsForStages) {
+  createStageContainer: function (amountCardsForStages, i) {
     const stageContainer = document.createElement('div');
     stageContainer.classList.add('stage-container');
     const stageText = document.createElement('span');
     stageText.classList.add('stage-text');
     stageText.textContent = amountCardsForStages.name;
+    // если totalAmountCards в стадии равен нулю, добавляем класс done (для изменения цвета текста выполненной стадии)
+    if (!this.state.amountCardsForStages[i].totalAmountCards) {
+      stageText.classList.add('done');
+    }
     stageContainer.append(stageText);
     const dotsContainer = document.createElement('div');
     dotsContainer.classList.add('dots-container');
@@ -269,10 +272,15 @@ const helper = {
     lastCard.style.backgroundImage = `url("${this.state.finalDeckCards[0].cardFace}")`;
     this.trekerDeck();
     this.state.finalDeckCards.shift();
+    // если в массиве финальной колоды уже нет элементов, удаляем класс актив, чтобы скрыть рубашку карты
+    if (!this.state.finalDeckCards.length) {
+      this.deck.classList.remove('active');
+    }
   },
   // трекер текущего состояния колоды
   trekerDeck: function () {
-    console.log(this.state.finalDeckCards[0]);
+    //массив с span.stage-text наименования стадии
+
     if (this.state.amountCardsForStages[0].totalAmountCards) {
       this.state.amountCardsForStages[0][this.state.finalDeckCards[0].color] -= 1;
       this.state.amountCardsForStages[0].totalAmountCards -= 1;
