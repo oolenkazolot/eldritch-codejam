@@ -71,7 +71,8 @@ code {
   opacity: 1;
 }
 
-.deck-container .shuffle-button { 
+.deck-container .shuffle-button {
+  display: none; 
   background-color:red;
   border:2px solid purple;
   color:purple;
@@ -79,12 +80,20 @@ code {
   padding:5px;
 }
 
+.deck-container .shuffle-button.active {
+  display: block;
+}
+
 
 
 .deck-container .current-state {
-  display:flex;
+  display:none;
   flex-direction:column;
   gap:10px;min-height:30%;
+}
+
+.deck-container .current-state.active {
+  display:flex;
 }
 
 
@@ -136,9 +145,14 @@ code {
 }
 
 .deck-container .deck,.deck-container .last-card { 
+  display: none;
   background-size:cover;
   height:190px;
   width:130px;
+}
+
+.deck-container .deck.active,.deck-container .last-card.active { 
+  display: block;
 }
 
 .App { 

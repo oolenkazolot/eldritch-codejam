@@ -1,12 +1,7 @@
 import ancientsData from './data/ancients.js';
-
-// let randomNumSlide = getRandomNum(1, 20);
-
-// function getRandomNum(min, max) {
-//   min = Math.ceil(min);
-//   max = Math.floor(max);
-//   return Math.floor(Math.random() * (max - min + 1)) + min;
-// }
+import cardsDataGreen from './data/mythicCards/green/index.js';
+import cardsDataBrown from './data/mythicCards/brown/index.js';
+import cardsDataBlue from './data/mythicCards/blue/index.js';
 
 const helper = {
   init: function () {
@@ -16,11 +11,17 @@ const helper = {
       ancient: null,
       // значение выбранного уровня сложности
       difficulty: null,
+      // массив зеленых карт в зависимости от выбранной карты древнего и от уровня сложности
+      greenCardsDifficulty: null,
+      // массив коричневых карт в зависимости от выбранной карты древнего и от уровня сложности
+      brownCardsDifficulty: null,
+      // массив голубых карт в зависимости от выбранной карты древнего и от уровня сложности
+      blueCardsDifficulty: null,
     };
     // кнопка замешивания колоды
     this.shuffleButton = document.querySelector('.shuffle-button');
     // при нажатии на кнопку замешивания колоды
-    this.shuffleButton.addEventListener('click', this.setCurrentState.bind(this));
+    this.shuffleButton.addEventListener('click', this.startNewGame.bind(this));
     // контейнер замешивания колоды
     this.deckContainer = document.querySelector('.deck-container');
     //контейнер с уровнями сложности
@@ -47,6 +48,12 @@ const helper = {
       e.target.classList.add('active');
       // добавляем класс active для появления уровней сложности
       this.difficultyContainer.classList.add('active');
+      // если уровень сложности выбран, то кнопку замешать колоду показывать
+      if (this.state.difficulty) {
+        this.addShuffleButton();
+      }
+      // скрыть элементы
+      this.hiddenElements();
     }
   },
   setDifficulty: function (e) {
@@ -62,17 +69,190 @@ const helper = {
       this.state.difficulty = e.target.dataset.difficulty;
       // добавляем класс active для отображения выбранного уровня сложности
       e.target.classList.add('active');
-      // добавляем класс active для отображения
-      this.deckContainer.classList.add('active');
+      // // добавляем класс active для отображения
+      // this.deckContainer.classList.add('active');
+
+      this.addShuffleButton();
+      this.hiddenElements();
     }
   },
-  setCurrentState: function () {
-    //мфссив с объектами данных карточек ancients
-    const arr = ancientsData;
-    // обЪект, с данными выбранной карточки ancient
-    let res = arr.find((item) => {
+  startNewGame: function () {
+    // ancientsData - массив объектов для хранения данных карточек ancients;
+    // обЪект, с данными выбранной карточки ancient (древнего)
+    let res = ancientsData.find((item) => {
       return item.id === this.state.ancient;
     });
+    //количество зеленых карт в зависимости от выбранной карты древнего
+    let numberOfGreenCards = res.firstStage.greenCards + res.secondStage.greenCards + res.thirdStage.greenCards;
+    //количество коричневых карт в зависимости от выбранной карты древнего
+    let numberOfBrownCards = res.firstStage.brownCards + res.secondStage.brownCards + res.thirdStage.brownCards;
+    //количество голубых карт в зависимости от выбранной карты древнего
+    let numberOfBlueCards = res.firstStage.blueCards + res.secondStage.blueCards + res.thirdStage.blueCards;
+
+    // получаем зеленые карты в зависимости от выбранной карты древнего и от уровня сложности
+    this.state.greenCardsDifficulty = this.shufflingСards(cardsDataGreen, numberOfGreenCards);
+    // получаем коричненые карты в зависимости от выбранной карты древнего и от уровня сложности
+    this.state.brownCardsDifficulty = this.shufflingСards(cardsDataBrown, numberOfBrownCards);
+    // получаем голубые карты в зависимости от выбранной карты древнего и от уровня сложности
+    this.state.blueCardsDifficulty = this.shufflingСards(cardsDataBlue, numberOfBlueCards);
+
+    // массив объектов с количеством карт для каждой стадии, в завистимости от выбранной карты древнего
+    const amountCardsForStages = [
+      {
+        name: 'Первая стадия',
+        amountGreenCards: res.firstStage.greenCards,
+        amountBlueCards: res.firstStage.blueCards,
+        amountBrownCards: res.firstStage.brownCards,
+      },
+      {
+        name: 'Вторая стадия',
+        amountGreenCards: res.secondStage.greenCards,
+        amountBlueCards: res.secondStage.blueCards,
+        amountBrownCards: res.secondStage.brownCards,
+      },
+      {
+        name: 'Третья стадия',
+        amountGreenCards: res.thirdStage.greenCards,
+        amountBlueCards: res.thirdStage.blueCards,
+        amountBrownCards: res.thirdStage.brownCards,
+      },
+    ];
+    //вызываем функцию, которая создаёт контейнер CurrentState и передаём ей stage
+    this.createCurrentState(amountCardsForStages);
+
+    //массив карт для каждого этапа
+    const firstStageCards = this.gettingStageCards(amountCardsForStages[0]);
+    console.log(firstStageCards);
+    const secondStageCards = this.gettingStageCards(amountCardsForStages[1]);
+    console.log(secondStageCards);
+    const thirdStageCards = this.gettingStageCards(amountCardsForStages[2]);
+    console.log(thirdStageCards);
+    this.showElements();
+  },
+  shufflingСards: function (cardsData, numberOfCards) {
+    const cardsDataShuffle = this.shuffleArray(cardsData);
+
+    // получаем карты в зависимости от выбранной карты древнего и от уровня сложности
+    let cardsDifficulty = [];
+    // выбираем нужные карточки по уровню сложности
+
+    cardsDifficulty = cardsDataShuffle.filter((element) => {
+      if (this.state.difficulty === 'very-easy') {
+        return element.difficulty === 'easy';
+      }
+      if (this.state.difficulty === 'easy') {
+        return element.difficulty === 'easy' || element.difficulty === 'normal';
+      }
+      if (this.state.difficulty === 'hard') {
+        return element.difficulty === 'normal' || element.difficulty === 'hard';
+      }
+      if (this.state.difficulty === 'very-hard') {
+        return element.difficulty === 'hard';
+      }
+      return element;
+    });
+
+    // если карточек нужного уровня сложности вернулось больше чем нам нужно, то обрезаем массив (в переменной numberOfGreenCards имется сколько нужно карточек)
+    if (cardsDifficulty.length > numberOfCards) {
+      // количество лишних карточек
+      const amountExtraСards = cardsDifficulty.length - numberOfCards;
+      // массив с необходимыми карточками по количеству и уровню сложности
+      cardsDifficulty = cardsDifficulty.slice(amountExtraСards);
+      return cardsDifficulty;
+    }
+
+    // если карточек нужного уровня сложности меньше, чем нам нужно, то добавляем обычные карточки
+    if (cardsDifficulty.length < numberOfCards) {
+      // количество нехватающих карточек
+      const amountMissingСards = numberOfCards - cardsDifficulty.length;
+      //  нехватающие карточки
+      let normalCards = cardsDataShuffle.filter((element) => {
+        return element.difficulty === 'normal';
+      });
+      //  нехватающиe карточки
+      const missingСards = normalCards.slice(0, amountMissingСards);
+      //  объединяем карточки с нехватающиe карточками
+      cardsDifficulty = cardsDifficulty.concat(missingСards);
+      return this.shuffleArray(cardsDifficulty);
+    }
+
+    return cardsDifficulty;
+  },
+  shuffleArray: function (array) {
+    for (let i = array.length - 1; i > 0; i--) {
+      let j = Math.floor(Math.random() * (i + 1));
+      [array[i], array[j]] = [array[j], array[i]];
+    }
+    return array;
+  },
+  createCurrentState: function (amountCardsForStages) {
+    const currentState = document.querySelector('.current-state');
+    currentState.textContent = '';
+    for (let i = 0; i < amountCardsForStages.length; i++) {
+      this.createStageContainer(amountCardsForStages[i]);
+      const stageContainer = this.createStageContainer(amountCardsForStages[i]);
+      currentState.append(stageContainer);
+    }
+  },
+  createStageContainer: function (amountCardsForStages) {
+    const stageContainer = document.createElement('div');
+    stageContainer.classList.add('stage-container');
+    const stageText = document.createElement('span');
+    stageText.classList.add('stage-text');
+    stageText.textContent = amountCardsForStages.name;
+    stageContainer.append(stageText);
+    const dotsContainer = document.createElement('div');
+    dotsContainer.classList.add('dots-container');
+    const dotGreen = document.createElement('div');
+    dotGreen.classList.add('dot');
+    dotGreen.classList.add('green');
+    dotGreen.textContent = amountCardsForStages.amountGreenCards;
+    dotsContainer.append(dotGreen);
+    const dotBrown = document.createElement('div');
+    dotBrown.classList.add('dot');
+    dotBrown.classList.add('brown');
+    dotBrown.textContent = amountCardsForStages.amountBrownCards;
+    dotsContainer.append(dotBrown);
+    const dotBlue = document.createElement('div');
+    dotBlue.classList.add('dot');
+    dotBlue.classList.add('blue');
+    dotBlue.textContent = amountCardsForStages.amountBlueCards;
+    dotsContainer.append(dotBlue);
+    stageContainer.append(dotsContainer);
+    return stageContainer;
+  },
+  hiddenElements: function () {
+    const currentState = document.querySelector('.current-state');
+    const deck = document.querySelector('.deck');
+    const lastCard = document.querySelector('.last-card');
+    currentState.classList.remove('active');
+    deck.classList.remove('active');
+    lastCard.classList.remove('active');
+  },
+  showElements: function () {
+    const currentState = document.querySelector('.current-state');
+    const deck = document.querySelector('.deck');
+    const lastCard = document.querySelector('.last-card');
+    currentState.classList.add('active');
+    deck.classList.add('active');
+    lastCard.classList.add('active');
+    this.hiddenShuffleButton();
+  },
+  addShuffleButton: function () {
+    this.deckContainer.classList.add('active');
+    this.shuffleButton.classList.add('active');
+  },
+  hiddenShuffleButton: function () {
+    this.shuffleButton.classList.remove('active');
+  },
+  //получение карт для стадий
+  gettingStageCards: function (amountCardsForStages) {
+    let cardsForStage = [];
+    const greenCards = this.state.greenCardsDifficulty.splice(0, amountCardsForStages.amountGreenCards);
+    const blueCards = this.state.blueCardsDifficulty.splice(0, amountCardsForStages.amountBlueCards);
+    const brownCards = this.state.brownCardsDifficulty.splice(0, amountCardsForStages.amountBrownCards);
+    cardsForStage = greenCards.concat(blueCards, brownCards);
+    return cardsForStage;
   },
 };
 
