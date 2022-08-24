@@ -17,7 +17,14 @@ const helper = {
       brownCardsDifficulty: null,
       // массив голубых карт в зависимости от выбранной карты древнего и от уровня сложности
       blueCardsDifficulty: null,
+      finalDeckCards: null,
+      amountCardsForStages: null,
     };
+    // карта при нажатии на которую появляется новая карта
+    this.deck = document.querySelector('.deck');
+    // при клике будет показывать карты по очереди
+    this.deck.addEventListener('click', this.showCards.bind(this));
+
     // кнопка замешивания колоды
     this.shuffleButton = document.querySelector('.shuffle-button');
     // при нажатии на кнопку замешивания колоды
@@ -69,8 +76,6 @@ const helper = {
       this.state.difficulty = e.target.dataset.difficulty;
       // добавляем класс active для отображения выбранного уровня сложности
       e.target.classList.add('active');
-      // // добавляем класс active для отображения
-      // this.deckContainer.classList.add('active');
 
       this.addShuffleButton();
       this.hiddenElements();
@@ -97,36 +102,41 @@ const helper = {
     this.state.blueCardsDifficulty = this.shufflingСards(cardsDataBlue, numberOfBlueCards);
 
     // массив объектов с количеством карт для каждой стадии, в завистимости от выбранной карты древнего
-    const amountCardsForStages = [
+    this.state.amountCardsForStages = [
       {
         name: 'Первая стадия',
-        amountGreenCards: res.firstStage.greenCards,
-        amountBlueCards: res.firstStage.blueCards,
-        amountBrownCards: res.firstStage.brownCards,
+        green: res.firstStage.greenCards,
+        blue: res.firstStage.blueCards,
+        brown: res.firstStage.brownCards,
+        totalAmountCards: res.firstStage.greenCards + res.firstStage.blueCards + res.firstStage.brownCards,
       },
       {
         name: 'Вторая стадия',
-        amountGreenCards: res.secondStage.greenCards,
-        amountBlueCards: res.secondStage.blueCards,
-        amountBrownCards: res.secondStage.brownCards,
+        green: res.secondStage.greenCards,
+        blue: res.secondStage.blueCards,
+        brown: res.secondStage.brownCards,
+        totalAmountCards: res.secondStage.greenCards + res.secondStage.blueCards + res.secondStage.brownCards,
       },
       {
         name: 'Третья стадия',
-        amountGreenCards: res.thirdStage.greenCards,
-        amountBlueCards: res.thirdStage.blueCards,
-        amountBrownCards: res.thirdStage.brownCards,
+        green: res.thirdStage.greenCards,
+        blue: res.thirdStage.blueCards,
+        brown: res.thirdStage.brownCards,
+        totalAmountCards: res.thirdStage.greenCards + res.thirdStage.blueCards + res.thirdStage.brownCards,
       },
     ];
+
     //вызываем функцию, которая создаёт контейнер CurrentState и передаём ей stage
-    this.createCurrentState(amountCardsForStages);
+    this.createCurrentState();
 
     //массив карт для каждого этапа
-    const firstStageCards = this.gettingStageCards(amountCardsForStages[0]);
-    console.log(firstStageCards);
-    const secondStageCards = this.gettingStageCards(amountCardsForStages[1]);
-    console.log(secondStageCards);
-    const thirdStageCards = this.gettingStageCards(amountCardsForStages[2]);
-    console.log(thirdStageCards);
+    const firstStageCards = this.gettingStageCards(this.state.amountCardsForStages[0]);
+    const secondStageCards = this.gettingStageCards(this.state.amountCardsForStages[1]);
+    const thirdStageCards = this.gettingStageCards(this.state.amountCardsForStages[2]);
+
+    // один общий массив карт со всеми этапами, сначала первый, потом второй этап, потом третий этап
+    this.state.finalDeckCards = [...firstStageCards, ...secondStageCards, ...thirdStageCards];
+
     this.showElements();
   },
   shufflingСards: function (cardsData, numberOfCards) {
@@ -185,12 +195,12 @@ const helper = {
     }
     return array;
   },
-  createCurrentState: function (amountCardsForStages) {
+  createCurrentState: function () {
     const currentState = document.querySelector('.current-state');
     currentState.textContent = '';
-    for (let i = 0; i < amountCardsForStages.length; i++) {
-      this.createStageContainer(amountCardsForStages[i]);
-      const stageContainer = this.createStageContainer(amountCardsForStages[i]);
+    for (let i = 0; i < this.state.amountCardsForStages.length; i++) {
+      this.createStageContainer(this.state.amountCardsForStages[i]);
+      const stageContainer = this.createStageContainer(this.state.amountCardsForStages[i]);
       currentState.append(stageContainer);
     }
   },
@@ -206,35 +216,33 @@ const helper = {
     const dotGreen = document.createElement('div');
     dotGreen.classList.add('dot');
     dotGreen.classList.add('green');
-    dotGreen.textContent = amountCardsForStages.amountGreenCards;
+    dotGreen.textContent = amountCardsForStages.green;
     dotsContainer.append(dotGreen);
     const dotBrown = document.createElement('div');
     dotBrown.classList.add('dot');
     dotBrown.classList.add('brown');
-    dotBrown.textContent = amountCardsForStages.amountBrownCards;
+    dotBrown.textContent = amountCardsForStages.brown;
     dotsContainer.append(dotBrown);
     const dotBlue = document.createElement('div');
     dotBlue.classList.add('dot');
     dotBlue.classList.add('blue');
-    dotBlue.textContent = amountCardsForStages.amountBlueCards;
+    dotBlue.textContent = amountCardsForStages.blue;
     dotsContainer.append(dotBlue);
     stageContainer.append(dotsContainer);
     return stageContainer;
   },
   hiddenElements: function () {
     const currentState = document.querySelector('.current-state');
-    const deck = document.querySelector('.deck');
     const lastCard = document.querySelector('.last-card');
     currentState.classList.remove('active');
-    deck.classList.remove('active');
+    this.deck.classList.remove('active');
     lastCard.classList.remove('active');
   },
   showElements: function () {
     const currentState = document.querySelector('.current-state');
-    const deck = document.querySelector('.deck');
     const lastCard = document.querySelector('.last-card');
     currentState.classList.add('active');
-    deck.classList.add('active');
+    this.deck.classList.add('active');
     lastCard.classList.add('active');
     this.hiddenShuffleButton();
   },
@@ -248,11 +256,34 @@ const helper = {
   //получение карт для стадий
   gettingStageCards: function (amountCardsForStages) {
     let cardsForStage = [];
-    const greenCards = this.state.greenCardsDifficulty.splice(0, amountCardsForStages.amountGreenCards);
-    const blueCards = this.state.blueCardsDifficulty.splice(0, amountCardsForStages.amountBlueCards);
-    const brownCards = this.state.brownCardsDifficulty.splice(0, amountCardsForStages.amountBrownCards);
+    const greenCards = this.state.greenCardsDifficulty.splice(0, amountCardsForStages.green);
+    const blueCards = this.state.blueCardsDifficulty.splice(0, amountCardsForStages.blue);
+    const brownCards = this.state.brownCardsDifficulty.splice(0, amountCardsForStages.brown);
     cardsForStage = greenCards.concat(blueCards, brownCards);
+    this.shuffleArray(cardsForStage);
     return cardsForStage;
+  },
+  // показ карт стек и
+  showCards: function () {
+    const lastCard = document.querySelector('.last-card');
+    lastCard.style.backgroundImage = `url("${this.state.finalDeckCards[0].cardFace}")`;
+    this.trekerDeck();
+    this.state.finalDeckCards.shift();
+  },
+  // трекер текущего состояния колоды
+  trekerDeck: function () {
+    console.log(this.state.finalDeckCards[0]);
+    if (this.state.amountCardsForStages[0].totalAmountCards) {
+      this.state.amountCardsForStages[0][this.state.finalDeckCards[0].color] -= 1;
+      this.state.amountCardsForStages[0].totalAmountCards -= 1;
+    } else if (this.state.amountCardsForStages[1].totalAmountCards) {
+      this.state.amountCardsForStages[1][this.state.finalDeckCards[0].color] -= 1;
+      this.state.amountCardsForStages[1].totalAmountCards -= 1;
+    } else if (this.state.amountCardsForStages[2].totalAmountCards) {
+      this.state.amountCardsForStages[2][this.state.finalDeckCards[0].color] -= 1;
+      this.state.amountCardsForStages[2].totalAmountCards -= 1;
+    }
+    this.createCurrentState();
   },
 };
 
