@@ -136,7 +136,8 @@ const helper = {
 
     // один общий массив карт со всеми этапами, сначала первый, потом второй этап, потом третий этап
     this.state.finalDeckCards = [...firstStageCards, ...secondStageCards, ...thirdStageCards];
-
+    const lastCard = document.querySelector('.last-card');
+    lastCard.style.backgroundImage = ``;
     this.showElements();
   },
   shufflingСards: function (cardsData, numberOfCards) {
@@ -266,7 +267,7 @@ const helper = {
     this.shuffleArray(cardsForStage);
     return cardsForStage;
   },
-  // показ карт стек и
+  // показ карт стек
   showCards: function () {
     const lastCard = document.querySelector('.last-card');
     lastCard.style.backgroundImage = `url("${this.state.finalDeckCards[0].cardFace}")`;
