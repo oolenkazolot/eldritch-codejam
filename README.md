@@ -1,41 +1,37 @@
-
 # Helper App for the game "Eldritch Horror"
 
 Stack: HTML, CSS, JavaScript
 
-Creating a complex deck shuffling algorithm in pure JavaScript
+[Link](https://oolenkazolot.github.io/eldritch-codejam/)
 
+Many tabletop game enthusiasts have heard of "Eldritch Horror" as one of the most exciting tabletop adventures. However, there is one challenge: preparing for the game can take inexperienced players anywhere from 40 minutes to an hour, and one of the most complex conditions is assembling the Myth deck. That's why I created a Helper App for the game "Eldritch Horror".
 
+Key Skill: Creating a complex deck shuffling algorithm in pure JavaScript
 
-## Синопсис и условия алгоритма
-Многие любители настольных игр слышали про Древний ужас как одно из интереснейших настольных приключений, однако есть одна сложность: подготовка к игре для неопытных игроков занимает от 40 минут до часа времени и одно из самых сложных условий это составление колоды мифов
+## Start Helper
 
-Для сборки колоды мифов используется три разных типа карт: синие, коричневые и зеленые (тип определяется по цвету полосы в шапке карты)
-Кроме того есть разная сложность карт:
-1. сложные карты имеют щупальцы вокруг название как на Синей карте в пример
-2. обычные карты не умеют никаких знаков как Коричневая карта в примере
-3. Легкие карты имеют изображение снежинок вокруг названия как зеленая карта в примере
+<image src="assets/screenshots/Screenshot_1.png" alt="start">
 
+## Algorithm Conditions
 
-На первом этапе игроку будет необходимо выбрать Древнего который укажет схему колоды и сколько карт какого цвета необходимо на каждом этапе игры
+When assembling the Myth deck in the game, three different types of cards are used: blue, brown, and green (determined by the color strip at the top of the card).
 
-Пример карты Древнего:
+Additionally, there are different levels of complexity for the cards:
 
-Состав карт необходимый для игры считается по сумме карт разных цветов на все 3 этапа
-Исходя из примера понадобится:
-Зеленых карт: 5
-Синих карт: 2
-Коричневых карт: 9
+Complex cards have tendrils around the title, like the blue card in the example.
+Normal cards have no markings, like the brown card in the example.
+Easy cards have snowflake symbols around the title, like the green card in the example.
+In the initial stage of the game, the player needs to choose an Ancient One, which determines the deck composition and the number of cards of each color needed at each stage of the game.
 
- Сложность игры:
+The composition of cards required for the game is calculated by adding up the cards of different colors for all three stages. Based on the example, the following cards are needed:
+Green cards: 5
+Blue cards: 2
+Brown cards: 9
 
-# Очень легкий уровень сложности: из набора берутся все карты со снежинками, если карт не хватает то добираются обычные карты
-# Легкий уровень сложности: из набора убираются карты с щупальцами
-# Средний уровень сложности: набор остается нетронутым
-# Высокий уровень сложности: из набора убираются карты со снежинками
-# Очень высокий уровень сложности: из набора берутся все карты со щупальцами, если карт не хватает то добираются обычные карты
+Game difficulty levels:
 
-Создать миниколоды для каждого этапа
-Для этого отобранные карты перемешиваются отдельно (должно получиться три маленькие колоды в которых будут расположены зеленые синие и коричневые карты соответственно в случайном порядке
-
-
+Very Easy: All cards with snowflake symbols are included in the set, and if there aren't enough, normal cards are added.
+Easy: Cards with tendrils are removed from the set.
+Medium: The set remains unchanged.
+Hard: Cards with snowflake symbols are removed from the set.
+Very Hard: All cards with tendrils are included in the set, and if there aren't enough, normal cards are added.
